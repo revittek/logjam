@@ -3,7 +3,15 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  firebase: {
+  	apiKey: "AIzaSyBNly1YD5N-e8uA55Cv7udKHtDNXIqvQRA",
+    authDomain: "logjam-catchphrase.firebaseapp.com",
+    databaseURL: "https://logjam-catchphrase.firebaseio.com",
+    projectId: "logjam-catchphrase",
+    storageBucket: "logjam-catchphrase.appspot.com",
+    messagingSenderId: "13977911084"
+  }
 };
 
 /*
