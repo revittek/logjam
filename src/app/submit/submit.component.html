@@ -8,16 +8,32 @@
 	    <input matInput placeholder="catchphrase" type="text" name="catchphrase" required formControlName="phrase">
 	    <mat-error>Missing catchphrase.</mat-error>
 	  </mat-form-field>
-	  <mat-form-field>
-  		<mat-select placeholder="Categories" multiple name="categories" formControlName="categories">
-    		<mat-option *ngFor="let category of categories" [value]="category">{{category}}</mat-option>
-    		<button mat-icon-button disabled></button>
-    		<mat-form-field>
-      			<input matInput #itemValue placeholder="New category...">
-    		</mat-form-field>
-    		<button mat-button (click)="saveItem(itemValue.value)">Save</button>
-  		</mat-select>
-	  </mat-form-field>
+	<mat-form-field class="example-chip-list">
+	  <mat-chip-list #chipList>
+	    <mat-chip
+	      *ngFor="let category of categories"
+	      [selectable]="selectable"
+	      [removable]="removable"
+	      (removed)="remove(category)">
+	      {{category}}
+	      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+	    </mat-chip>
+	    <input
+	      placeholder="Categories:"
+	      #categoryInput
+	      [formControl]="categoryCtrl"
+	      [matAutocomplete]="auto"
+	      [matChipInputFor]="chipList"
+	      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+	      [matChipInputAddOnBlur]="addOnBlur"
+	      (matChipInputTokenEnd)="add($event)">
+	  </mat-chip-list>
+	  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+	    <mat-option *ngFor="let category of filteredCategories | async" [value]="category">
+	      {{category}}
+	    </mat-option>
+	  </mat-autocomplete>
+	</mat-form-field>
 	  <button type="submit" mat-flat-button color="primary" [disabled]="submitForm.invalid">Submit catchphrase</button>
 	</div>
 </form>
