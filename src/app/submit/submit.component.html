@@ -9,8 +9,14 @@
 	    <mat-error>Missing catchphrase.</mat-error>
 	  </mat-form-field>
 	  <mat-form-field>
-	    <input matInput placeholder="category" type="text" name="category" formControlName="category">
-	    <mat-hint>Separate categories by commas</mat-hint>
+  		<mat-select placeholder="Categories" multiple name="categories" formControlName="categories">
+    		<mat-option *ngFor="let category of categories" [value]="category">{{category}}</mat-option>
+    		<button mat-icon-button disabled></button>
+    		<mat-form-field>
+      			<input matInput #itemValue placeholder="New category...">
+    		</mat-form-field>
+    		<button mat-button (click)="saveItem(itemValue.value)">Save</button>
+  		</mat-select>
 	  </mat-form-field>
 	  <button type="submit" mat-flat-button color="primary" [disabled]="submitForm.invalid">Submit catchphrase</button>
 	</div>

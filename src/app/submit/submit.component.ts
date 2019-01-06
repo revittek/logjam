@@ -13,15 +13,17 @@ import { FormGroup, FormControl, FormsModule, ReactiveFormsModule, Validators } 
 export class SubmitComponent implements OnInit {
   submitForm: FormGroup;
   snackBar: MatSnackBar;
+  public categories: Array<string> = [];
   constructor(private db: AngularFirestore, public snickers: MatSnackBar) {
     this.snackBar = snickers;
   }
 
   ngOnInit() {
+    this.retrieveCategories();
   	this.submitForm = new FormGroup({
       phrase: new FormControl('', { validators: [Validators.required] }),
       user: new FormControl('', { validators: [Validators.required] }),
-      category: new FormControl(null, { validators: [] })
+      categories: new FormControl(null, { validators: [] })
     });
   }
 
@@ -50,6 +52,33 @@ export class SubmitComponent implements OnInit {
     this.submitForm.markAsPristine();
     this.submitForm.markAsUntouched();
     this.submitForm.reset();
+  }
+
+  private retrieveCategories() {
+    this.categories = [];
+    let result = this.db.collection('categories').get();
+    result.forEach(value =>
+      {
+        value.forEach(entry =>
+        {
+          this.categories.push(entry.get("categoryName"))
+      });
+    });
+  }
+
+    /** Save the node to database */
+  saveItem(newCategory: string) {
+    if(!this.categories.includes(newCategory)){
+      let addCategory = {
+        'categoryName': newCategory
+      }
+      this.db.collection('categories').add(addCategory);
+      this.retrieveCategories();
+    }else{
+      this.snackBar.open('Already a category called that', 'Dismiss', {
+        duration: 2000
+      });
+    }
   }
 
 }
