@@ -20,7 +20,7 @@ export class SubmitComponent implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA];
   categoryCtrl = new FormControl();
   filteredCategories: Observable<string[]>;
-  categories: string[] = ['2019'];
+  categories: string[] = [];
   allCategories: string[] = [];
 
   @ViewChild('categoryInput') categoryInput: ElementRef<HTMLInputElement>;
@@ -44,21 +44,35 @@ export class SubmitComponent implements OnInit {
     });
   }
 
-  onSubmit() {
-    let splitCategories = null;
-    if (this.submitForm.value.category) {
-      splitCategories = this.submitForm.value.category.split(',');
-    } else {
-      splitCategories = [];
+  async onSubmit() {
+    let theseCategories = [];
+    let isDuplicate = false;
+    for (let category of this.categories) {
+      if (!theseCategories.includes(category)) {
+        theseCategories.push(category);
+      } 
     }
   	let phrase = {
       phrase: this.submitForm.value.phrase,
       user: this.submitForm.value.user,
       dateAdded: new Date(),
-      categories: splitCategories
+      categories: theseCategories
     }
-
-  	this.addDataToDatabase(phrase);
+    let alreadySubmitted = await this.db.collection('phrases').get().toPromise();
+    alreadySubmitted.docs.forEach(entry => {
+      if (phrase.phrase == entry.get('phrase')) {
+        isDuplicate = true;
+      }
+    });
+    if (!isDuplicate) {
+      this.addDataToDatabase(phrase);
+      this.saveCategories(this.categories);
+      this.categories = [];
+    } else {
+      this.snackBar.open('This catchphrase already exists!', 'Dismiss', {
+        duration: 2000
+      });
+    }
   }
 
   private addDataToDatabase(phrase: Phrase) {
@@ -78,23 +92,22 @@ export class SubmitComponent implements OnInit {
       {
         value.forEach(entry =>
         {
-          this.allCategories.push(entry.get("categoryName"))
+          this.allCategories.push(entry.get("categoryName"));
       });
     });
+    this.allCategories = this.allCategories.sort();
   }
 
     /** Save the node to database */
-  saveItem(newCategory: string) {
-    if(!this.allCategories.includes(newCategory)){
-      let addCategory = {
-        'categoryName': newCategory
+  saveCategories(newCategories: Array<string>) {
+    for (let newCategory of newCategories) {
+      if(!this.allCategories.includes(newCategory)){
+        let addCategory = {
+          'categoryName': newCategory
+        }
+        this.db.collection('categories').add(addCategory);
+        this.retrieveCategories();
       }
-      this.db.collection('categories').add(addCategory);
-      this.retrieveCategories();
-    }else{
-      this.snackBar.open('Already a category called that', 'Dismiss', {
-        duration: 2000
-      });
     }
   }
   add(event: MatChipInputEvent): void {
