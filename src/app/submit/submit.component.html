@@ -1,11 +1,11 @@
 <form [formGroup]="submitForm" (ngSubmit)="onSubmit()">
 	<div class="formContainer">
 	  <mat-form-field>
-	  	<input matInput placeholder="name" type="text" name="username" required formControlName="user">
+	  	<input matInput placeholder="name" type="text" name="username" maxlength="300" required formControlName="user">
 	  	<mat-error>Missing name.</mat-error>
 	  </mat-form-field>
 	  <mat-form-field>
-	    <input matInput placeholder="catchphrase" type="text" name="catchphrase" required formControlName="phrase">
+	    <input matInput placeholder="catchphrase" type="text" name="catchphrase" maxlength="30" required formControlName="phrase">
 	    <mat-error>Missing catchphrase.</mat-error>
 	  </mat-form-field>
 	<mat-form-field class="example-chip-list">
@@ -20,7 +20,8 @@
 	    </mat-chip>
 	    <input
 	      placeholder="Categories:"
-	      #categoryInput
+				#categoryInput
+				maxlength="30"
 	      [formControl]="categoryCtrl"
 	      [matAutocomplete]="auto"
 	      [matChipInputFor]="chipList"
