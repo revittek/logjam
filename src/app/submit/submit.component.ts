@@ -58,12 +58,9 @@ export class SubmitComponent implements OnInit {
       dateAdded: new Date(),
       categories: theseCategories
     }
-    let alreadySubmitted = await this.db.collection('phrases').get().toPromise();
-    alreadySubmitted.docs.forEach(entry => {
-      if (phrase.phrase == entry.get('phrase')) {
-        isDuplicate = true;
-      }
-    });
+    var matchingExistingPhrases = await this.db.collection('phrases', ref => ref.where('phrase', '==', phrase.phrase)).get().toPromise();
+    isDuplicate = matchingExistingPhrases.docs.length > 0;
+
     if (!isDuplicate) {
       this.addDataToDatabase(phrase);
       this.saveCategories(this.categories);
