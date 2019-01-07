@@ -82,17 +82,17 @@ export class SubmitComponent implements OnInit {
     this.submitForm.reset();
   }
 
-  private retrieveCategories() {
+  private async retrieveCategories() {
     this.allCategories = [];
-    let result = this.db.collection('categories').get();
-    result.forEach(value =>
-      {
-        value.forEach(entry =>
+    let result = await this.db.collection('categories', ref => ref.orderBy("categoryName")).get().toPromise();
+    result.forEach(entry =>
         {
-          this.allCategories.push(entry.get("categoryName"));
+          var category = entry.get("categoryName");
+          if(this.allCategories.includes(category) === false)
+          {
+            this.allCategories.push(entry.get("categoryName"));
+          }
       });
-    });
-    this.allCategories = this.allCategories.sort();
   }
 
     /** Save the node to database */
