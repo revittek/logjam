@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Phrase } from '../phrase.model';
 import { AngularFirestore } from 'angularfire2/firestore';
-import { NgForm, FormGroup, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgForm, FormGroup, FormControl, FormsModule, ReactiveFormsModule, Validators, FormGroupDirective } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule, MatAutocompleteSelectedEvent, MatChipInputEvent, MatAutocomplete } from '@angular/material';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Observable} from 'rxjs';
@@ -22,6 +22,8 @@ export class SubmitComponent implements OnInit {
   filteredCategories: Observable<string[]>;
   categories: string[] = [];
   allCategories: string[] = [];
+
+  errorStateMatcher = new PristineErrorStateMatcher();
 
   @ViewChild('categoryInput') categoryInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
@@ -146,5 +148,11 @@ export class SubmitComponent implements OnInit {
     const filterValue = value.toLowerCase();
 
     return this.allCategories.filter(category => category.toLowerCase().indexOf(filterValue) === 0);
+  }
+}
+
+export class PristineErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    return !!(control && control.invalid && (control.touched || (form && form.submitted)) && !control.pristine);
   }
 }
